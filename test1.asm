@@ -15,7 +15,6 @@ calc:
     mov rcx, argn
 loop1:
     mov al, [rdi+rcx-1]
-    ;add al, 1
     mov byte [rsi+rcx-1], al
     loop loop1
 
@@ -31,6 +30,7 @@ calcFast:
     %idefine argy [rsi]
     %idefine argn rdx
 
+    mov rcx, argn
     xchg rdi, rsi
     rep movsb
     xchg rdi, rsi
