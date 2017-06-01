@@ -1,10 +1,10 @@
 section .text
 
-global calc
-global calcFast
+global memcpy_normal
+global memcpy_movs
 
 ;-----------------------------
-calc:
+memcpy_normal:
     push rbp
     mov rbp,rsp
 
@@ -22,7 +22,7 @@ loop1:
     ret
 
 ;-----------------------------
-calcFast:
+memcpy_movs:
     push rbp
     mov rbp,rsp
 

@@ -1,8 +1,16 @@
 #include <string.h>
 #include <iostream>
 #include <chrono>
+#include <cassert>
 using namespace std;
 using namespace std::chrono;
+
+enum STRCMP{
+    NORMAL,
+    CMPS,
+    SSE42,
+    STANDARD,
+};
 
 extern "C" int strcmp_normal(char* a,char* b, int n);
 extern "C" int strcmp_cmps  (char* a,char* b, int n);
@@ -12,7 +20,6 @@ extern "C" int strcmp_sse42 (char* a,char* b, int n);
 
 const int SIZE = 1000'000'000;
 //const int SIZE = 16*6;
-//const int SIZE = 33;
 
 void test(int id) {
     char* a=new char[SIZE+1];
@@ -28,39 +35,50 @@ void test(int id) {
     b[SIZE/6]+=3;
 
     high_resolution_clock::time_point t1;
-    if (id==0) {
-        cout << "normal: ";
-        t1 = high_resolution_clock::now();
-        cout << strcmp_normal(a, b, SIZE) << endl;
-    }else if (id==1) {
-        cout << "cmps  : ";
-        t1 = high_resolution_clock::now();
-        cout << strcmp_cmps(a, b, SIZE) << endl;
-        //cout << strcmp_cmps(a, b) << endl;
-    }else if (id==2) {
-        cout << "sse42 : ";
-        t1 = high_resolution_clock::now();
-        cout << strcmp_sse42(a, b, SIZE) << endl;
-        //cout << strcmp_sse42(a, b) << endl;
-    } else if (id==3) {
-        cout << "standard strcmp : ";
-        t1 = high_resolution_clock::now();
-        cout << strcmp(a, b) << endl;
-        //cout << strcmp_sse42(a, b) << endl;
+
+    int result=-1;
+    switch(id) {
+        case STRCMP::NORMAL:
+            cout << "normal: ";
+            t1 = high_resolution_clock::now();
+            result = strcmp_normal(a, b, SIZE);
+            break;
+
+        case STRCMP::CMPS:
+            cout << "cmps  : ";
+            t1 = high_resolution_clock::now();
+            result = strcmp_cmps(a, b, SIZE);
+            break;
+
+        case STRCMP::SSE42:
+            cout << "sse42 : ";
+            t1 = high_resolution_clock::now();
+            result = strcmp_sse42(a, b, SIZE);
+            break;
+
+        case STRCMP::STANDARD:
+            cout << "std   : ";
+            t1 = high_resolution_clock::now();
+            result = strcmp(a, b);
+            break;
+
+        default:
+            assert(0);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
-
     auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-    cout << "exec time: " << duration << endl;
+    cout << "exec_time=" << duration << " ";
+    cout << "Result=" << result << " ";
+    cout << endl;
 
     delete [] a;
     delete [] b;
 }
 
 int main() {
-    test(0);
-    test(1);
-    test(2);
-    test(3);
+    test(STRCMP::NORMAL);
+    test(STRCMP::CMPS);
+    test(STRCMP::SSE42);
+    test(STRCMP::STANDARD);
     return 0;
 }
