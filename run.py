@@ -4,15 +4,15 @@ from subprocess import Popen, PIPE, call
 
 EXECUTABLE = "./test"
 
-print('''
----------\\
+print(r'''
+---------\
 Building |
 ---------/
 ''')
 call(['make'])
 
-print('''
----------\\
+print(r'''
+---------\
 Running  |
 ---------/
 ''')
@@ -22,6 +22,21 @@ class Result:
     def __init__(self, name, data):
         self._name = name
         self._data= {k:list(map(int,v)) for k,*v in data}
+
+    def printTable(self):
+        print(self._name)
+        JUST = 10
+        labels = ["", "min", "max", "med"]
+        lines = []
+        lines.append([JUST*"_"]*len(labels))
+        lines.append(labels)
+        for k,v in self._data.items():
+            lines.append([JUST*"-"]*len(labels))
+            lines.append([k, min(v), max(v), sum(v)/len(v)])
+        for l in lines:
+            print('|'.join(map(lambda x: str(x).rjust(JUST), l)))
+        print()
+
 
     def __str__(self):
         ret = self._name + '\n\t'
@@ -45,16 +60,25 @@ while i < len(out):
     i += count
     results.append(Result(name,data))
 
-print('''
----------\\
-Results  |
----------/
+print(r'''
+------------\
+Results rav |
+------------/
 ''')
 
 print('\n'.join(map(str,results)))
 
-print('''
----------\\
+print(r'''
+--------------\
+Results tables|
+--------------/
+''')
+
+for r in results:
+    r.printTable()
+
+print(r'''
+---------\
 Clearing |
 ---------/
 ''')
