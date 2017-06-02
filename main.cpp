@@ -18,7 +18,7 @@ enum class MEMCPY : int{
 extern "C" void memcpy_normal(char* a,char* b, int n);
 extern "C" void memcpy_movs  (char* a,char* b, int n);
 
-const int STRCMP_TESTS_COUNT = 3;
+const int STRCMP_TESTS_COUNT = 4;
 enum class STRCMP : int{
     NORMAL,
     CMPS,
