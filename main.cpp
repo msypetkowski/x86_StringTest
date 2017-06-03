@@ -29,8 +29,20 @@ extern "C" int strcmp_normal(char* a,char* b, int n);
 extern "C" int strcmp_cmps  (char* a,char* b, int n);
 extern "C" int strcmp_sse42 (char* a,char* b, int n);
 
+const int STRLEN_TESTS_COUNT = 4;
+enum class STRLEN : int{
+    NORMAL,
+    SCAS,
+    SSE42,
+    STANDARD,
+};
+extern "C" int strlen_normal(char* a);
+extern "C" int strlen_scas  (char* a);
+extern "C" int strlen_sse42 (char* a);
+
 map<MEMCPY,vector<int>> memcpyResults;
 map<STRCMP,vector<int>> strcmpResults;
+map<STRLEN,vector<int>> strlenResults;
 map<MEMCPY, string> memcpyNames = {
     {MEMCPY::NORMAL, "NORMAL"},
     {MEMCPY::MOVS, "MOVS"},
@@ -41,6 +53,12 @@ map<STRCMP, string> strcmpNames = {
     {STRCMP::CMPS, "CMPS"},
     {STRCMP::SSE42, "SSE42"},
     {STRCMP::STANDARD, "STANDARD"},
+};
+map<STRLEN, string> strlenNames = {
+    {STRLEN::NORMAL, "NORMAL"},
+    {STRLEN::SCAS, "SCAS"},
+    {STRLEN::SSE42, "SSE42"},
+    {STRLEN::STANDARD, "STANDARD"},
 };
 
 void testMemcpy(MEMCPY id, int size) {
@@ -120,9 +138,51 @@ void testStrcmp(STRCMP id, int size) {
     delete [] b;
 }
 
+void testStrlen(STRLEN id, int size) {
+    char* a=new char[size+1];
+    char* b=new char[size+1];
+    memset(a, 0, size+1);
+    memset(b, 0, size+1);
+    for (int i=0;i<size;++i) {
+        a[i] = 'a' + i%('z'-'a'+1);
+        b[i] = 'a' + i%('z'-'a'+1);
+    }
+    high_resolution_clock::time_point t1;
+
+    int result=-1;
+    switch(id) {
+        case STRLEN::NORMAL:
+            t1 = high_resolution_clock::now();
+            result = strlen_normal(a);
+            break;
+        case STRLEN::SCAS:
+            t1 = high_resolution_clock::now();
+            result = strlen_scas(a);
+            break;
+        case STRLEN::SSE42:
+            t1 = high_resolution_clock::now();
+            result = strlen_sse42(a);
+            break;
+        case STRLEN::STANDARD:
+            t1 = high_resolution_clock::now();
+            result = strlen(a);
+            break;
+        default:
+            assert(0);
+    }
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    assert(result == size);
+    strlenResults[id].push_back(duration);
+
+    delete [] a;
+    delete [] b;
+}
+
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
-        int size = 16 * 1'000'000 ;
+        int size = 16 * 400'000 ;
+        //int size = 160 ;
         cerr << "Testing MEMCPY" << endl;
         testMemcpy(MEMCPY::NORMAL, size);
         testMemcpy(MEMCPY::MOVS, size);
@@ -133,6 +193,12 @@ int main() {
         testStrcmp(STRCMP::CMPS, size);
         testStrcmp(STRCMP::SSE42, size);
         testStrcmp(STRCMP::STANDARD, size);
+
+        cerr << "Testing STRLEN" << endl;
+        testStrlen(STRLEN::NORMAL, size);
+        testStrlen(STRLEN::SCAS, size);
+        testStrlen(STRLEN::SSE42, size);
+        testStrlen(STRLEN::STANDARD, size);
     }
 
     cout << "MEMCPY " << MEMCPY_TESTS_COUNT << endl;
@@ -146,6 +212,14 @@ int main() {
     cout << "STRCMP " << STRCMP_TESTS_COUNT << endl;
     for(auto a : strcmpResults ) {
         cout << strcmpNames[a.first] << " ";
+        for(int res : a.second)
+            cout << res << " ";
+        cout << endl;
+    }
+
+    cout << "STRLEN " << STRLEN_TESTS_COUNT << endl;
+    for(auto a : strlenResults ) {
+        cout << strlenNames[a.first] << " ";
         for(int res : a.second)
             cout << res << " ";
         cout << endl;
