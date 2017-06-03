@@ -7,7 +7,7 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 20;
+const int TEST_ITERATIONS = 30;
 
 const int MEMCPY_TESTS_COUNT = 3;
 enum class MEMCPY : int{

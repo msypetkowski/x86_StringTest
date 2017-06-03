@@ -26,13 +26,15 @@ class Result:
     def printTable(self):
         print(self._name)
         JUST = 10
-        labels = ["", "min", "max", "med"]
+        labels = ["", "min", "max", "med", "rel. stddev"]
         lines = []
         lines.append([JUST*"_"]*len(labels))
         lines.append(labels)
         for k,v in self._data.items():
             lines.append([JUST*"-"]*len(labels))
-            lines.append([k, min(v), max(v), sum(v)/len(v)])
+            medVal = sum(v)/len(v)
+            relStddev = sum(map(lambda x: (x-medVal)**2, v))**0.5 / medVal
+            lines.append([k, min(v), max(v), round(medVal,1), relStddev])
         for l in lines:
             print('|'.join(map(lambda x: str(x).rjust(JUST), l)))
         print()
