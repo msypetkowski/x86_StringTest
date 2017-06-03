@@ -69,14 +69,20 @@ strcmp_sse42:
 
     xor rax, rax
 
+    sub rax, 16
+    sub rdi, 16
+    sub rsi, 16
+
 STRCMP_LOOP:
     add rax, 16
     add rdi, 16
     add rsi, 16
+
     MovDqU  xmm0, [rdi]
     MovDqU  xmm1, [rsi]
     ; find the first *different* bytes, hence negative polarity
     PcmpIstrI xmm0, xmm1, EQUAL_EACH + NEGATIVE_POLARITY
+
     ja STRCMP_LOOP
 
     add rax, rcx

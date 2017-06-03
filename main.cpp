@@ -87,7 +87,7 @@ void testStrcmp(STRCMP id, int size) {
         a[i] = 'a' + i%('z'-'a'+1);
         b[i] = 'a' + i%('z'-'a'+1);
     }
-    b[size/6]+=3;
+    b[size/3]+=3;
     high_resolution_clock::time_point t1;
 
     int result=-1;
@@ -113,7 +113,7 @@ void testStrcmp(STRCMP id, int size) {
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-    assert(result == size/6 || result == -3);
+    assert(result == size/3 || result == -3);
     strcmpResults[id].push_back(duration);
 
     delete [] a;

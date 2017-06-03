@@ -77,9 +77,9 @@ Results tables|
 for r in results:
     r.printTable()
 
-print(r'''
----------\
-Clearing |
----------/
-''')
-call(['make','clean'])
+# print(r'''
+# ---------\
+# Clearing |
+# ---------/
+# ''')
+# call(['make','clean'])
