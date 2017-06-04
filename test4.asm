@@ -90,52 +90,67 @@ END_LOOP1:
 
     pop rbp
     ret
-; 
-; ;---------------------------- witch pcmpestrI
-; 
-; ; Immediate byte constants for SSE4.2 string instructions
-; %idefine EQUAL_ANY	           0000b
-; %idefine RANGES		           0100b
-; %idefine EQUAL_EACH	           1000b
-; %idefine EQUAL_ORDERED	       1100b
-; %idefine NEGATIVE_POLARITY   010000b
-; %idefine BYTE_MASK	        1000000b
-; 
-; strstr_sse42:
-;     push rbp
-;     mov rbp,rsp
-; 
-;     %idefine argx [rdi]
-;     %idefine argy [rsi]
-; 
-;     dec rdi
-; LOOP_2:
-;     inc rdi
-; 
-;     mov rcx, 0x7fffffff
-; 
-;     push rdi
-;     push rsi
-;     repz cmpsb
-;     pop rsi
-;     pop rdi
-; 
-;     mov rbx, 0x7fffffff
-;     sub rbx, rcx
-; 
-;     mov al, [rdi + rbx] ; symbol from text
-;     mov ah, [rsi + rbx] ; symbol from key
-; 
-;     cmp ah, 0
-;     je END_LOOP2 ; found
-; 
-;     cmp al, 0 ; end of text
-;     je END_LOOP2 ; no match
-; 
-;     jmp LOOP_2
-; END_LOOP2:
-; 
-;     mov rax, rdi
-; 
-;     pop rbp
-;     ret
+
+
+;---------------------------- witch pcmpestrI
+
+; Immediate byte constants for SSE4.2 string instructions
+%idefine EQUAL_ANY	           0000b
+%idefine RANGES		           0100b
+%idefine EQUAL_EACH	           1000b
+%idefine EQUAL_ORDERED	       1100b
+%idefine NEGATIVE_POLARITY   010000b
+%idefine BYTE_MASK	        1000000b
+
+
+strstr_sse42:
+
+    mov rcx, rdi
+    mov rdx, rsi
+
+    ; rcx = haystack, rdx = needle
+
+    push rsi
+    push rdi
+    MovDqU xmm2, [rdx] ; load the first 16 bytes of neddle
+    Pxor xmm3, xmm3
+    lea rax, [rcx - 16]
+
+  ; find the first possible match of 16-byte fragment in haystack
+STRSTR_MAIN_LOOP:
+        add rax, 16
+        PcmpIstrI xmm2, [rax], EQUAL_ORDERED
+        ja STRSTR_MAIN_LOOP
+
+    jnc STRSTR_NOT_FOUND
+
+    add rax, rcx ; save the possible match start
+    mov rdi, rdx
+    mov rsi, rax
+    sub rdi, rsi
+    sub rsi, 16
+
+    ; compare the strings
+STRSTR_LOOP:
+        add rsi, 16
+        MovDqU    xmm1, [rsi + rdi] ; read from needle
+        ; mask out invalid bytes in the haystack
+        PcmpIstrM xmm3, xmm1, EQUAL_EACH + NEGATIVE_POLARITY + BYTE_MASK
+        MovDqU xmm4, [rsi] ; read from haystack
+        PAnd xmm4, xmm0
+        PcmpIstrI xmm1, xmm4, EQUAL_EACH + NEGATIVE_POLARITY
+        ja STRSTR_LOOP
+
+    jnc STRSTR_FOUND
+
+    ; continue searching from the next byte
+    sub rax, 15
+    jmp STRSTR_MAIN_LOOP
+
+STRSTR_NOT_FOUND:
+    xor rax, rax
+
+STRSTR_FOUND:
+    pop rdi
+    pop rsi
+    ret

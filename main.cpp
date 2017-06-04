@@ -10,7 +10,6 @@ using namespace std::chrono;
 
 const int TEST_ITERATIONS = 10;
 
-const int MEMCPY_TESTS_COUNT = 3;
 enum class MEMCPY : int{
     NORMAL,
     MOVS,
@@ -19,7 +18,6 @@ enum class MEMCPY : int{
 extern "C" void memcpy_normal(char* a,char* b, int n);
 extern "C" void memcpy_movs  (char* a,char* b, int n);
 
-const int STRCMP_TESTS_COUNT = 4;
 enum class STRCMP : int{
     NORMAL,
     CMPS,
@@ -30,7 +28,6 @@ extern "C" int strcmp_normal(char* a,char* b, int n);
 extern "C" int strcmp_cmps  (char* a,char* b, int n);
 extern "C" int strcmp_sse42 (char* a,char* b, int n);
 
-const int STRLEN_TESTS_COUNT = 4;
 enum class STRLEN : int{
     NORMAL,
     SCAS,
@@ -41,7 +38,6 @@ extern "C" int strlen_normal(const char* a);
 extern "C" int strlen_scas  (const char* a);
 extern "C" int strlen_sse42 (const char* a);
 
-const int STRSTR_TESTS_COUNT = 3;
 enum class STRSTR : int{
     NORMAL,
     CMPS,
@@ -219,8 +215,8 @@ void testStrstr(STRSTR id) {
             break;
         case STRSTR::SSE42:
             t1 = high_resolution_clock::now();
-            //result = strstr_sse42(&text[0], key);
-            result = strstr(&text[0], key);
+            result = strstr_sse42(&text[0], key);
+            //result = strstr(&text[0], key);
             break;
         case STRSTR::STANDARD:
             t1 = high_resolution_clock::now();
@@ -266,11 +262,11 @@ int main() {
         cerr << "Testing STRSTR" << endl;
         testStrstr(STRSTR::NORMAL);
         testStrstr(STRSTR::CMPS);
-        //testStrstr(STRSTR::SSE42);
+        testStrstr(STRSTR::SSE42);
         testStrstr(STRSTR::STANDARD);
     }
 
-    cout << "MEMCPY " << MEMCPY_TESTS_COUNT << endl;
+    cout << "MEMCPY " << memcpyResults.size() << endl;
     for(auto a : memcpyResults ) {
         cout << memcpyNames[a.first] << " ";
         for(int res : a.second)
@@ -278,7 +274,7 @@ int main() {
         cout << endl;
     }
 
-    cout << "STRCMP " << STRCMP_TESTS_COUNT << endl;
+    cout << "STRCMP " << strcmpResults.size() << endl;
     for(auto a : strcmpResults ) {
         cout << strcmpNames[a.first] << " ";
         for(int res : a.second)
@@ -286,7 +282,7 @@ int main() {
         cout << endl;
     }
 
-    cout << "STRLEN " << STRLEN_TESTS_COUNT << endl;
+    cout << "STRLEN " << strlenResults.size() << endl;
     for(auto a : strlenResults ) {
         cout << strlenNames[a.first] << " ";
         for(int res : a.second)
@@ -295,7 +291,7 @@ int main() {
     }
 
 
-    cout << "STRSTR " << STRSTR_TESTS_COUNT << endl;
+    cout << "STRSTR " << strstrResults.size() << endl;
     for(auto a : strstrResults ) {
         cout << strstrNames[a.first] << " ";
         for(int res : a.second)

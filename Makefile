@@ -4,7 +4,7 @@ all:
 	nasm -f elf64 test2.asm -o test2.o -g
 	nasm -f elf64 test3.asm -o test3.o -g
 	nasm -f elf64 test4.asm -o test4.o -g
-	g++ main.o test1.o test2.o test3.o test4.o -o test -g #-O2
+	g++ main.o test1.o test2.o test3.o test4.o -o test -g -O2
 
 clean:
 	rm test1.o
