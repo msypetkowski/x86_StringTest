@@ -25,7 +25,7 @@ endloop1:
     pop rbp
     ret
 
-;---------------------------- witch cmpsb
+;---------------------------- witch scasb
 strlen_scas:
     push rbp
     mov rbp,rsp

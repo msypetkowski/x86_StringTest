@@ -4,10 +4,11 @@
 #include <cassert>
 #include <vector>
 #include <map>
+#include <fstream>
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 30;
+const int TEST_ITERATIONS = 3;
 
 const int MEMCPY_TESTS_COUNT = 3;
 enum class MEMCPY : int{
@@ -36,13 +37,25 @@ enum class STRLEN : int{
     SSE42,
     STANDARD,
 };
-extern "C" int strlen_normal(char* a);
-extern "C" int strlen_scas  (char* a);
-extern "C" int strlen_sse42 (char* a);
+extern "C" int strlen_normal(const char* a);
+extern "C" int strlen_scas  (const char* a);
+extern "C" int strlen_sse42 (const char* a);
+
+const int STRSTR_TESTS_COUNT = 2;
+enum class STRSTR : int{
+    NORMAL,
+    XXX,
+    SSE42,
+    STANDARD,
+};
+extern "C" char* strstr_normal(char* a, char* b);
+extern "C" char* strstr_xxx   (char* a, char* b);
+extern "C" char* strstr_sse42 (char* a, char* b);
 
 map<MEMCPY,vector<int>> memcpyResults;
 map<STRCMP,vector<int>> strcmpResults;
 map<STRLEN,vector<int>> strlenResults;
+map<STRSTR,vector<int>> strstrResults;
 map<MEMCPY, string> memcpyNames = {
     {MEMCPY::NORMAL, "NORMAL"},
     {MEMCPY::MOVS, "MOVS"},
@@ -59,6 +72,12 @@ map<STRLEN, string> strlenNames = {
     {STRLEN::SCAS, "SCAS"},
     {STRLEN::SSE42, "SSE42"},
     {STRLEN::STANDARD, "STANDARD"},
+};
+map<STRSTR, string> strstrNames = {
+    {STRSTR::NORMAL, "NORMAL"},
+    {STRSTR::XXX, "XXX"},
+    {STRSTR::SSE42, "SSE42"},
+    {STRSTR::STANDARD, "STANDARD"},
 };
 
 void testMemcpy(MEMCPY id, int size) {
@@ -179,9 +198,53 @@ void testStrlen(STRLEN id, int size) {
     delete [] b;
 }
 
+void testStrstr(STRSTR id) {
+    ifstream t("text.txt");
+    string text((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    char key[] = "This is text that we need";
+    high_resolution_clock::time_point t1;
+    char* result = nullptr;
+    switch(id) {
+        case STRSTR::NORMAL:
+            t1 = high_resolution_clock::now();
+            result = strstr_normal(&text[0], key);
+            //result = strstr(&text[0], key);
+            break;
+        case STRSTR::XXX:
+            t1 = high_resolution_clock::now();
+            assert(id == STRSTR::XXX);
+            result = strstr_xxx(&text[0], key);
+            assert(id == STRSTR::XXX);
+            //result = strstr(&text[0], key);
+            break;
+        case STRSTR::SSE42:
+            t1 = high_resolution_clock::now();
+            //result = strstr_sse42(&text[0], key);
+            result = strstr(&text[0], key);
+            break;
+        case STRSTR::STANDARD:
+            t1 = high_resolution_clock::now();
+            result = strstr(&text[0], key);
+            break;
+        default:
+            assert(0);
+    }
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    char expected[] = "This is text that we needThis is text suffix\n";
+    // cout << result << endl;
+    // cout << expected << endl;
+    // cout << strlen(result)<< endl;
+    // cout << strlen(expected) << endl;
+    assert(strlen(result) == strlen(expected));
+    assert(strcmp(result, expected)==0);
+    strstrResults[id].push_back(duration);
+}
+
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
-        int size = 16 * 400'000 ;
+		int size = 16 * 400*1000 ;
         //int size = 160 ;
         cerr << "Testing MEMCPY" << endl;
         testMemcpy(MEMCPY::NORMAL, size);
@@ -199,6 +262,12 @@ int main() {
         testStrlen(STRLEN::SCAS, size);
         testStrlen(STRLEN::SSE42, size);
         testStrlen(STRLEN::STANDARD, size);
+
+        cerr << "Testing STRSTR" << endl;
+        testStrstr(STRSTR::NORMAL);
+        //testStrstr(STRSTR::XXX);
+        //testStrstr(STRSTR::SSE42);
+        testStrstr(STRSTR::STANDARD);
     }
 
     cout << "MEMCPY " << MEMCPY_TESTS_COUNT << endl;
@@ -220,6 +289,15 @@ int main() {
     cout << "STRLEN " << STRLEN_TESTS_COUNT << endl;
     for(auto a : strlenResults ) {
         cout << strlenNames[a.first] << " ";
+        for(int res : a.second)
+            cout << res << " ";
+        cout << endl;
+    }
+
+
+    cout << "STRSTR " << STRSTR_TESTS_COUNT << endl;
+    for(auto a : strstrResults ) {
+        cout << strstrNames[a.first] << " ";
         for(int res : a.second)
             cout << res << " ";
         cout << endl;
