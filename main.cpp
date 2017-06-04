@@ -8,7 +8,7 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 3;
+const int TEST_ITERATIONS = 10;
 
 const int MEMCPY_TESTS_COUNT = 3;
 enum class MEMCPY : int{
@@ -41,10 +41,10 @@ extern "C" int strlen_normal(const char* a);
 extern "C" int strlen_scas  (const char* a);
 extern "C" int strlen_sse42 (const char* a);
 
-const int STRSTR_TESTS_COUNT = 2;
+const int STRSTR_TESTS_COUNT = 3;
 enum class STRSTR : int{
     NORMAL,
-    XXX,
+    CMPS,
     SSE42,
     STANDARD,
 };
@@ -75,7 +75,7 @@ map<STRLEN, string> strlenNames = {
 };
 map<STRSTR, string> strstrNames = {
     {STRSTR::NORMAL, "NORMAL"},
-    {STRSTR::XXX, "XXX"},
+    {STRSTR::CMPS, "CMPS"},
     {STRSTR::SSE42, "SSE42"},
     {STRSTR::STANDARD, "STANDARD"},
 };
@@ -209,13 +209,12 @@ void testStrstr(STRSTR id) {
         case STRSTR::NORMAL:
             t1 = high_resolution_clock::now();
             result = strstr_normal(&text[0], key);
-            //result = strstr(&text[0], key);
             break;
-        case STRSTR::XXX:
+        case STRSTR::CMPS:
             t1 = high_resolution_clock::now();
-            assert(id == STRSTR::XXX);
+            assert(id == STRSTR::CMPS);
             result = strstr_xxx(&text[0], key);
-            assert(id == STRSTR::XXX);
+            assert(id == STRSTR::CMPS);
             //result = strstr(&text[0], key);
             break;
         case STRSTR::SSE42:
@@ -239,6 +238,7 @@ void testStrstr(STRSTR id) {
     // cout << strlen(expected) << endl;
     assert(strlen(result) == strlen(expected));
     assert(strcmp(result, expected)==0);
+    //strstrResults[STRSTR::CMPS].push_back(duration);
     strstrResults[id].push_back(duration);
 }
 
@@ -265,7 +265,7 @@ int main() {
 
         cerr << "Testing STRSTR" << endl;
         testStrstr(STRSTR::NORMAL);
-        //testStrstr(STRSTR::XXX);
+        testStrstr(STRSTR::CMPS);
         //testStrstr(STRSTR::SSE42);
         testStrstr(STRSTR::STANDARD);
     }

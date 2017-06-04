@@ -57,14 +57,21 @@ LOOP_1:
 
     mov rcx, 0x7fffffff
 
-    push rdi
-    push rsi
+    ;push rdi
+    mov r8, rdi
+    ;push rsi
+    mov r9, rsi
+
     repz cmpsb
-    pop rsi
-    pop rdi
+
+    ;pop rsi
+    mov rsi, r9
+    ;pop rdi
+    mov rdi, r8
 
     mov rdx, 0x7fffffff
     sub rdx, rcx
+    dec rdx
 
     mov al, [rdi + rdx] ; symbol from text
     mov ah, [rsi + rdx] ; symbol from key
@@ -78,7 +85,7 @@ LOOP_1:
     jmp LOOP_1
 END_LOOP1:
 
-    xor rbx, rbx
+    ;xor rbx, rbx
     mov rax, rdi
 
     pop rbp
