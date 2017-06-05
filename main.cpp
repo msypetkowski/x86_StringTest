@@ -8,7 +8,7 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 10;
+const int TEST_ITERATIONS = 1000;
 
 enum class MEMCPY : int{
     NORMAL,
@@ -104,7 +104,7 @@ void testMemcpy(MEMCPY id, int size) {
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     assert(strcmp(a,b) == 0);
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
     memcpyResults[id].push_back(duration);
 
     delete [] a;
@@ -145,7 +145,7 @@ void testStrcmp(STRCMP id, int size) {
             assert(0);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
     assert(result == size/3 || result == -3);
     strcmpResults[id].push_back(duration);
 
@@ -186,7 +186,7 @@ void testStrlen(STRLEN id, int size) {
             assert(0);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
     assert(result == size);
     strlenResults[id].push_back(duration);
 
@@ -226,7 +226,7 @@ void testStrstr(STRSTR id) {
             assert(0);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
     char expected[] = "This is text that we needThis is text suffix\n";
     // cout << result << endl;
     // cout << expected << endl;
@@ -240,7 +240,7 @@ void testStrstr(STRSTR id) {
 
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
-		int size = 16 * 400*1000 ;
+		int size = 16 * 10*1000 ;
         //int size = 160 ;
         cerr << "Testing MEMCPY" << endl;
         testMemcpy(MEMCPY::NORMAL, size);
