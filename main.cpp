@@ -14,11 +14,13 @@ enum class MEMCPY : int{
     NORMAL,
     MOVSB,
     MOVSQ,
+    MOVDQU,
     STANDARD,
 };
 extern "C" void memcpy_normal(char* a,char* b, int n);
 extern "C" void memcpy_movsb (char* a,char* b, int n);
 extern "C" void memcpy_movsq (char* a,char* b, int n);
+extern "C" void memcpy_movdqu(char* a,char* b, int n);
 
 enum class STRCMP : int{
     NORMAL,
@@ -58,6 +60,7 @@ map<MEMCPY, string> memcpyNames = {
     {MEMCPY::NORMAL, "NORMAL"},
     {MEMCPY::MOVSB, "MOVSB"},
     {MEMCPY::MOVSQ, "MOVSQ"},
+    {MEMCPY::MOVDQU, "MOVDQU"},
     {MEMCPY::STANDARD, "STANDARD"},
 };
 map<STRCMP, string> strcmpNames = {
@@ -102,6 +105,10 @@ void testMemcpy(MEMCPY id, int size) {
             t1 = high_resolution_clock::now();
             memcpy_movsq(a, b, size);
             break;
+        case MEMCPY::MOVDQU:
+            t1 = high_resolution_clock::now();
+            memcpy_movdqu(a, b, size);
+            break;
         case MEMCPY::STANDARD:
             t1 = high_resolution_clock::now();
             memcpy(b, a, size);
@@ -110,6 +117,9 @@ void testMemcpy(MEMCPY id, int size) {
             assert(0);
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    // cout << "------------------" <<endl;
+    // cout << a <<endl;
+    // cout << b <<endl;
     assert(strcmp(a,b) == 0);
     auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
     memcpyResults[id].push_back(duration);
@@ -247,12 +257,15 @@ void testStrstr(STRSTR id) {
 
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
+        // int size = 7;
 		int size = 16 * 10*1000 ;
-        //int size = 160 ;
+		// int size = 16 + 5;
+        //int size = 160 +7;
         cerr << "Testing MEMCPY" << endl;
         testMemcpy(MEMCPY::NORMAL, size);
         testMemcpy(MEMCPY::MOVSB, size);
         testMemcpy(MEMCPY::MOVSQ, size);
+        testMemcpy(MEMCPY::MOVDQU, size);
         testMemcpy(MEMCPY::STANDARD, size);
 
         cerr << "Testing STRCMP" << endl;
