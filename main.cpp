@@ -8,15 +8,17 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 1000;
+const int TEST_ITERATIONS = 200;
 
 enum class MEMCPY : int{
     NORMAL,
-    MOVS,
+    MOVSB,
+    MOVSQ,
     STANDARD,
 };
 extern "C" void memcpy_normal(char* a,char* b, int n);
-extern "C" void memcpy_movs  (char* a,char* b, int n);
+extern "C" void memcpy_movsb (char* a,char* b, int n);
+extern "C" void memcpy_movsq (char* a,char* b, int n);
 
 enum class STRCMP : int{
     NORMAL,
@@ -54,7 +56,8 @@ map<STRLEN,vector<int>> strlenResults;
 map<STRSTR,vector<int>> strstrResults;
 map<MEMCPY, string> memcpyNames = {
     {MEMCPY::NORMAL, "NORMAL"},
-    {MEMCPY::MOVS, "MOVS"},
+    {MEMCPY::MOVSB, "MOVSB"},
+    {MEMCPY::MOVSQ, "MOVSQ"},
     {MEMCPY::STANDARD, "STANDARD"},
 };
 map<STRCMP, string> strcmpNames = {
@@ -91,9 +94,13 @@ void testMemcpy(MEMCPY id, int size) {
             t1 = high_resolution_clock::now();
             memcpy_normal(a, b, size);
             break;
-        case MEMCPY::MOVS:
+        case MEMCPY::MOVSB:
             t1 = high_resolution_clock::now();
-            memcpy_movs(a, b, size);
+            memcpy_movsb(a, b, size);
+            break;
+        case MEMCPY::MOVSQ:
+            t1 = high_resolution_clock::now();
+            memcpy_movsq(a, b, size);
             break;
         case MEMCPY::STANDARD:
             t1 = high_resolution_clock::now();
@@ -244,7 +251,8 @@ int main() {
         //int size = 160 ;
         cerr << "Testing MEMCPY" << endl;
         testMemcpy(MEMCPY::NORMAL, size);
-        testMemcpy(MEMCPY::MOVS, size);
+        testMemcpy(MEMCPY::MOVSB, size);
+        testMemcpy(MEMCPY::MOVSQ, size);
         testMemcpy(MEMCPY::STANDARD, size);
 
         cerr << "Testing STRCMP" << endl;

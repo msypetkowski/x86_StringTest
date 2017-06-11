@@ -1,7 +1,8 @@
 section .text
 
 global memcpy_normal
-global memcpy_movs
+global memcpy_movsb
+global memcpy_movsq
 
 ;-----------------------------
 memcpy_normal:
@@ -22,7 +23,7 @@ loop1:
     ret
 
 ;-----------------------------
-memcpy_movs:
+memcpy_movsb:
     push rbp
     mov rbp,rsp
 
@@ -34,6 +35,36 @@ memcpy_movs:
     xchg rdi, rsi
     rep movsb
     xchg rdi, rsi
+
+    pop rbp
+    ret
+
+;---------------------------------
+
+memcpy_movsq:
+    push rbp
+    mov rbp,rsp
+
+    %idefine argx [rdi]
+    %idefine argy [rsi]
+    %idefine argn rdx
+
+    mov rcx, argn
+    sar rcx, 3
+
+    xchg rdi, rsi
+    rep movsq
+
+    ; remaining bytes
+    mov rax, argn
+    sar rax, 3
+    sal rax, 3
+    mov rcx, argn
+    sub rcx, rax
+    rep movsb
+
+    xchg rdi, rsi
+
 
     pop rbp
     ret
