@@ -1,0 +1,57 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{english}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\title{x86 string test}
+\author{Michał Sypetkowski}
+\date{}
+
+\begin{document}
+\maketitle
+
+
+\section{Introduction}\label{sec:intro}
+Various implementations of basic 4 string algorithms (memcpy, strcmp, strlen and strstr) were measured by terms of performance.
+Standard C library implementations of these algorithms were also included into comparison.
+\end{intro}
+
+\section{Benchmarks}\label{sec:benchmarks}
+
+\subsection{Memcpy}\label{subsec:memcpy}
+    Tested implementations:
+    \begin{enumerate}
+        \item normal - without fast strings instructions or SSE
+        \item movsb
+        \item movsq
+    \end{enumerate}
+\end{memcpy}
+
+\subsection{Strcmp}\label{subsec:strcmp}
+    Tested implementations:
+    \begin{enumerate}
+        \item normal - without fast strings instructions or SSE
+        \item cmps
+        \item sse42
+    \end{enumerate}
+\end{strcmp}
+
+\subsection{Strlen}\label{subsec:strlen}
+    Tested implementations:
+    \begin{enumerate}
+        \item normal - without fast strings instructions or SSE
+        \item scas
+        \item sse42
+    \end{enumerate}
+\end{strlen}
+
+\subsection{Strstr}\label{subsec:strstr}
+    Tested implementations:
+    \begin{enumerate}
+        \item normal - without fast strings instructions or SSE
+        \item cmps
+        \item sse42
+    \end{enumerate}
+\end{strstr}
+
+\end{document}
