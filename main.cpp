@@ -8,7 +8,7 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 200'000;
+const int TEST_ITERATIONS = 1000;
 
 enum class MEMCPY : int{
     NORMAL,

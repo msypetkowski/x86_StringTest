@@ -9,7 +9,7 @@ print(r'''
 Building |
 ---------/
 ''')
-call(['make'])
+call(['make','release'])
 
 print(r'''
 ---------\

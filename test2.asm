@@ -49,7 +49,7 @@ strcmp_cmps:
     pop rbp
     ret
 
-;---------------------------- witch pcmpestrI
+;---------------------------- witch pcmpistrI
 
 ; Immediate byte constants for SSE4.2 string instructions
 %idefine EQUAL_ANY	           0000b
@@ -79,11 +79,10 @@ STRCMP_LOOP:
     add rsi, 16
 
     MovDqU  xmm0, [rdi]
-    MovDqU  xmm1, [rsi]
-    ; find the first *different* bytes, hence negative polarity
-    PcmpIstrI xmm0, xmm1, EQUAL_EACH + NEGATIVE_POLARITY
+    ; find the first different bytes, hence negative polarity
+    PcmpIstrI xmm0, [rsi], EQUAL_EACH + NEGATIVE_POLARITY
 
-    ja STRCMP_LOOP
+    ja STRCMP_LOOP ; all equal
 
     add rax, rcx
 
