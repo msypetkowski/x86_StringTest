@@ -9,12 +9,9 @@
 
 \begin{document}
 \maketitle
-
-
 \section{Introduction}\label{sec:intro}
 Various implementations of basic 4 string algorithms (memcpy, strcmp, strlen and strstr) were measured by terms of performance.
 Standard C library implementations of these algorithms were also included into comparison.
-\end{intro}
 
 \section{Benchmarks}\label{sec:benchmarks}
 
@@ -22,10 +19,33 @@ Standard C library implementations of these algorithms were also included into c
     Tested implementations:
     \begin{enumerate}
         \item normal - without fast strings instructions or SSE
-        \item movsb
-        \item movsq
+        \item with movsb - fast string instruction
+        \item with movsq - fast string instruction
+        \item with movdqu - SSE instruction
     \end{enumerate}
-\end{memcpy}
+
+
+Results - string size: \textbf{8011} , samples: \textbf{100 000}
+\begin{lstlisting}[]
+MEMCPY
+__________|__________|__________|__________|__________
+          |       min|       max|       med|rel. stddev
+----------|----------|----------|----------|----------
+    NORMAL|     11865|     34554|   12315.7|   16.5778
+----------|----------|----------|----------|----------
+     MOVSB|       102|     10585|     200.2|  111.3528
+----------|----------|----------|----------|----------
+     MOVSQ|       123|     15054|     212.0|  128.3399
+----------|----------|----------|----------|----------
+    MOVDQU|       922|     13191|     961.7|   67.3049
+----------|----------|----------|----------|----------
+  STANDARD|       103|      9367|     201.4|   92.3262
+\end{lstlisting}
+
+$NORMAL$ results are obvious. $MOVSQ$ suprisingly is slightly slower than $MOVSB$, these instructions exists mostly for legacy support, so they may be not optimized very well.
+$STANDARD$ implementation probably use $MOVSB$, because times minimum (and even medium) times are similar.
+But why copying 16-byte blocks with $MOVDQU$ is slower?
+
 
 \subsection{Strcmp}\label{subsec:strcmp}
     Tested implementations:
@@ -34,7 +54,6 @@ Standard C library implementations of these algorithms were also included into c
         \item cmps
         \item sse42
     \end{enumerate}
-\end{strcmp}
 
 \subsection{Strlen}\label{subsec:strlen}
     Tested implementations:
@@ -43,7 +62,6 @@ Standard C library implementations of these algorithms were also included into c
         \item scas
         \item sse42
     \end{enumerate}
-\end{strlen}
 
 \subsection{Strstr}\label{subsec:strstr}
     Tested implementations:
@@ -52,6 +70,5 @@ Standard C library implementations of these algorithms were also included into c
         \item cmps
         \item sse42
     \end{enumerate}
-\end{strstr}
 
 \end{document}

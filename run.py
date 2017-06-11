@@ -34,7 +34,7 @@ class Result:
             lines.append([JUST*"-"]*len(labels))
             medVal = sum(v)/len(v)
             relStddev = sum(map(lambda x: (x-medVal)**2, v))**0.5 / medVal
-            lines.append([k, min(v), max(v), round(medVal,1), relStddev])
+            lines.append([k, min(v), max(v), round(medVal,1), round(relStddev,4)])
         for l in lines:
             print('|'.join(map(lambda x: str(x).rjust(JUST), l)))
         print()

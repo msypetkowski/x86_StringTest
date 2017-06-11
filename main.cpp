@@ -8,7 +8,7 @@
 using namespace std;
 using namespace std::chrono;
 
-const int TEST_ITERATIONS = 200;
+const int TEST_ITERATIONS = 200'000;
 
 enum class MEMCPY : int{
     NORMAL,
@@ -137,7 +137,8 @@ void testStrcmp(STRCMP id, int size) {
         a[i] = 'a' + i%('z'-'a'+1);
         b[i] = 'a' + i%('z'-'a'+1);
     }
-    b[size/3]+=3;
+    int changedIndex = size - size/9;
+    b[changedIndex]+=3;
     high_resolution_clock::time_point t1;
 
     int result=-1;
@@ -163,7 +164,7 @@ void testStrcmp(STRCMP id, int size) {
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
-    assert(result == size/3 || result == -3);
+    assert(result == changedIndex || result == -3);
     strcmpResults[id].push_back(duration);
 
     delete [] a;
@@ -258,7 +259,7 @@ void testStrstr(STRSTR id) {
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
         // int size = 7;
-		int size = 16 * 10*1000 ;
+		int size = 8011;
 		// int size = 16 + 5;
         //int size = 160 +7;
         cerr << "Testing MEMCPY" << endl;
