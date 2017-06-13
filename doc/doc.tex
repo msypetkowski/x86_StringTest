@@ -113,6 +113,7 @@ But why copying 16-byte blocks with $MOVDQU$ is slower?
         \item normal - without fast strings instructions or SSE
         \item cmps
         \item sse42
+        \item pcmpeqb - MMX instruction
         \item standard C library implementation
     \end{enumerate}
 Results - string size: \textbf{8011} , samples: \textbf{100 000}
@@ -121,16 +122,17 @@ STRCMP
 __________|__________|__________|__________|__________
           |       min|       max|       med|rel. stddev
 ----------|----------|----------|----------|----------
-    NORMAL|     14739|     52502|   16740.1|   35.2456
+    NORMAL|     12630|     46203|   13152.6|    24.343
 ----------|----------|----------|----------|----------
-      CMPS|      4232|     42086|    4428.6|   32.8246
+      CMPS|      4233|     21667|    4414.5|   44.5999
 ----------|----------|----------|----------|----------
-     SSE42|       425|     10734|     449.1|   65.4052
+     SSE42|       423|     15343|     445.9|  118.0751
 ----------|----------|----------|----------|----------
-  STANDARD|       340|     10686|     369.0|   72.3815
+   PCMPEQB|       387|     12064|     416.4|  143.2525
+----------|----------|----------|----------|----------
+  STANDARD|       341|     15808|     365.4|  139.8601
 \end{lstlisting}
-Only surprising result here is that $STANDARD$ implementation is for some reason faster than my SSE42 implementation.
-
+$STANDARD$ implementation uses $PCMEQB$, but it is for some reason slightly faster than my implementation.
 
 
 
