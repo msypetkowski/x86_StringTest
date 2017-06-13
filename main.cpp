@@ -26,10 +26,12 @@ enum class STRCMP : int{
     NORMAL,
     CMPS,
     SSE42,
+    PCMP,
     STANDARD,
 };
 extern "C" int strcmp_normal(char* a,char* b, int n);
 extern "C" int strcmp_cmps  (char* a,char* b, int n);
+extern "C" int strcmp_pcmp  (char* a,char* b, int n);
 extern "C" int strcmp_sse42 (char* a,char* b, int n);
 
 enum class STRLEN : int{
@@ -66,6 +68,7 @@ map<MEMCPY, string> memcpyNames = {
 map<STRCMP, string> strcmpNames = {
     {STRCMP::NORMAL, "NORMAL"},
     {STRCMP::CMPS, "CMPS"},
+    {STRCMP::PCMP, "PCMPEQB"},
     {STRCMP::SSE42, "SSE42"},
     {STRCMP::STANDARD, "STANDARD"},
 };
@@ -151,6 +154,10 @@ void testStrcmp(STRCMP id, int size) {
             t1 = high_resolution_clock::now();
             result = strcmp_cmps(a, b, size);
             break;
+        case STRCMP::PCMP:
+            t1 = high_resolution_clock::now();
+            result = strcmp_pcmp(a, b, size);
+            break;
         case STRCMP::SSE42:
             t1 = high_resolution_clock::now();
             result = strcmp_sse42(a, b, size);
@@ -164,6 +171,7 @@ void testStrcmp(STRCMP id, int size) {
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
+    // cout << result << " " << changedIndex << endl;
     assert(result == changedIndex || result == -3);
     strcmpResults[id].push_back(duration);
 
@@ -259,7 +267,8 @@ void testStrstr(STRSTR id) {
 int main() {
     for (int q=0 ; q < TEST_ITERATIONS ; ++q) {
         // int size = 7;
-		int size = 8011;
+        int size = 8011;
+		//int size = 3200;
 		// int size = 16 + 5;
         //int size = 160 +7;
         cerr << "Testing MEMCPY" << endl;
@@ -272,6 +281,7 @@ int main() {
         cerr << "Testing STRCMP" << endl;
         testStrcmp(STRCMP::NORMAL, size);
         testStrcmp(STRCMP::CMPS, size);
+        testStrcmp(STRCMP::PCMP, size);
         testStrcmp(STRCMP::SSE42, size);
         testStrcmp(STRCMP::STANDARD, size);
 

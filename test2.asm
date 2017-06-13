@@ -2,6 +2,7 @@ section .text
 
 global strcmp_normal
 global strcmp_cmps
+global strcmp_pcmp
 global strcmp_sse42
 
 ;----------------------------- witchout special instructions
@@ -48,6 +49,57 @@ strcmp_cmps:
 
     pop rbp
     ret
+
+;---------------------------- witch pcmpeqb
+
+strcmp_pcmp:
+    push rbp
+    mov rbp,rsp
+
+    %idefine argx [rdi]
+    %idefine argy [rsi]
+    %idefine argn rdx
+
+    xor rax, rax
+
+    sub rax, 16
+    sub rdi, 16
+    sub rsi, 16
+
+PCMP_LOOP:
+    add rax, 16
+    add rdi, 16
+    add rsi, 16
+
+    movdqa xmm1,[rsi]
+    movdqa xmm2,[rdi]
+    pcmpeqb xmm0,xmm1
+    pcmpeqb xmm1,xmm2
+    psubb  xmm1,xmm0
+    pmovmskb edx,xmm1
+    sub    edx,0xffff
+    je PCMP_LOOP
+
+    ; compare tailing 0-15 bytes
+    mov r9, rax
+    mov rcx, argn
+PCMP_REST_LOOP:
+    mov al, [rdi]
+    mov ah, [rsi]
+    cmp al, ah
+    jne PCMP_REST_LOOP_END
+    inc rdi
+    inc rsi
+    loop PCMP_REST_LOOP
+PCMP_REST_LOOP_END:
+    mov rax, argn
+    sub rax, rcx
+
+    add rax, r9
+
+    pop rbp
+    ret
+
 
 ;---------------------------- witch pcmpistrI
 
