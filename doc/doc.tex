@@ -148,22 +148,22 @@ STRLEN
 __________|__________|__________|__________|__________
           |       min|       max|       med|rel. stddev
 ----------|----------|----------|----------|----------
-    NORMAL|      3116|     68635|    3324.8|   48.4119
+    NORMAL|      3126|     42095|    3323.7|   39.8071
 ----------|----------|----------|----------|----------
-      SCAS|      4753|     43623|    5119.1|   84.6218
+      SCAS|      4754|     37463|    5046.8|   70.1096
 ----------|----------|----------|----------|----------
-       SSE|       224|     18735|     262.7|   155.306
+       SSE|       164|     11841|     182.0|  134.0813
 ----------|----------|----------|----------|----------
-     SSE42|       468|     33412|     496.4|  122.4961
+     SSE42|       468|     10767|     490.9|   81.8084
 ----------|----------|----------|----------|----------
-  STANDARD|       133|     11526|     162.0|   198.591
+  STANDARD|       129|     11024|     157.2|  185.7166
 \end{lstlisting}
 
 Fast string instruction $SCASB$ is slower than $NORMAL$ implementation in this benchmark.
 It may be, because this instruction exists mostly for legacy support.
 Similary like in STRCMP results, SSE42 implementation is slower than implementation from standard library.
 $STANDARD$ implementation uses MMX instruction pcmpeqb, and SSE pmovmskb and pminub.
-My $SSE$ implementation is slower because it doesn't use pminub.
+My $SSE$ implementation is slower because it doesn't use pminub in optimal way (pminub uses per iteration or sometching like this).
 
 
 \subsection{Strstr}\label{subsec:strstr}

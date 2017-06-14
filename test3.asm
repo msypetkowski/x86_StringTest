@@ -53,16 +53,22 @@ strlen_sse:
     %idefine argx [rdi]
 
     mov rax, rdi
-    sub rax, 16
+    sub rax, 32
     pxor   xmm1,xmm1
 SSE_LOOP:
-    add rax, 16
+    add rax, 16 * 8
 
     movdqa xmm0,[rax]
-    ; TODO: use pminub
-    ; pminub xmm0,[rax+0x10]
-    ; pminub xmm0,[rax+0x20]
-    ; pminub xmm0,[rax+0x30]
+    ; TODO: check memory access violations
+    pminub xmm0,[rax+0x10]
+    pminub xmm0,[rax+0x20]
+    pminub xmm0,[rax+0x30]
+
+    pminub xmm0,[rax+0x40]
+    pminub xmm0,[rax+0x50]
+    pminub xmm0,[rax+0x60]
+    pminub xmm0,[rax+0x70]
+
     pcmpeqb xmm0,xmm1
     pmovmskb edx,xmm0
     test edx, edx
