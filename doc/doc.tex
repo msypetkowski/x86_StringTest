@@ -101,9 +101,7 @@ __________|__________|__________|__________|__________
 \end{lstlisting}
 $NORMAL$ results are obvious. $MOVSQ$ suprisingly is slightly slower than $MOVSB$, these instructions exists mostly for legacy support, so they may be not optimized very well.
 $STANDARD$ implementation probably use $MOVSB$, because times minimum (and even medium) times are similar.
-But why copying 16-byte blocks with $MOVDQU$ is slower?
-
-
+Copying 16-byte blocks with $MOVDQU$ is slower, it may be that movsb is well optimized for memcpy task.
 
 
 
@@ -150,18 +148,22 @@ STRLEN
 __________|__________|__________|__________|__________
           |       min|       max|       med|rel. stddev
 ----------|----------|----------|----------|----------
-    NORMAL|      3104|     19807|    3334.9|   50.9368
+    NORMAL|      3116|     68635|    3324.8|   48.4119
 ----------|----------|----------|----------|----------
-      SCAS|      4753|     33091|    4980.9|   43.7135
+      SCAS|      4753|     43623|    5119.1|   84.6218
 ----------|----------|----------|----------|----------
-     SSE42|       470|     12316|     494.2|  111.0874
+       SSE|       224|     18735|     262.7|   155.306
 ----------|----------|----------|----------|----------
-  STANDARD|       129|     16138|     151.2|  225.5433
+     SSE42|       468|     33412|     496.4|  122.4961
+----------|----------|----------|----------|----------
+  STANDARD|       133|     11526|     162.0|   198.591
 \end{lstlisting}
 
 Fast string instruction $SCASB$ is slower than $NORMAL$ implementation in this benchmark.
 It may be, because this instruction exists mostly for legacy support.
-Similary like in STRCMP results, my SSE42 implementation is slower than implementation from standard library.
+Similary like in STRCMP results, SSE42 implementation is slower than implementation from standard library.
+$STANDARD$ implementation uses MMX instruction pcmpeqb, and SSE pmovmskb and pminub.
+My $SSE$ implementation is slower because it doesn't use pminub.
 
 
 \subsection{Strstr}\label{subsec:strstr}
