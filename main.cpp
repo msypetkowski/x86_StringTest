@@ -37,11 +37,13 @@ extern "C" int strcmp_sse42 (char* a,char* b, int n);
 enum class STRLEN : int{
     NORMAL,
     SCAS,
+    SSE,
     SSE42,
     STANDARD,
 };
 extern "C" int strlen_normal(const char* a);
 extern "C" int strlen_scas  (const char* a);
+extern "C" int strlen_sse(const char* a);
 extern "C" int strlen_sse42 (const char* a);
 
 enum class STRSTR : int{
@@ -75,6 +77,7 @@ map<STRCMP, string> strcmpNames = {
 map<STRLEN, string> strlenNames = {
     {STRLEN::NORMAL, "NORMAL"},
     {STRLEN::SCAS, "SCAS"},
+    {STRLEN::SSE, "SSE"},
     {STRLEN::SSE42, "SSE42"},
     {STRLEN::STANDARD, "STANDARD"},
 };
@@ -200,6 +203,10 @@ void testStrlen(STRLEN id, int size) {
             t1 = high_resolution_clock::now();
             result = strlen_scas(a);
             break;
+        case STRLEN::SSE:
+            t1 = high_resolution_clock::now();
+            result = strlen_sse(a);
+            break;
         case STRLEN::SSE42:
             t1 = high_resolution_clock::now();
             result = strlen_sse42(a);
@@ -213,6 +220,7 @@ void testStrlen(STRLEN id, int size) {
     }
     high_resolution_clock::time_point t2 = high_resolution_clock::now();
     auto duration = duration_cast<nanoseconds>( t2 - t1 ).count();
+    //cout << result << " " << size << endl;
     assert(result == size);
     strlenResults[id].push_back(duration);
 
@@ -288,6 +296,7 @@ int main() {
         cerr << "Testing STRLEN" << endl;
         testStrlen(STRLEN::NORMAL, size);
         testStrlen(STRLEN::SCAS, size);
+        testStrlen(STRLEN::SSE, size);
         testStrlen(STRLEN::SSE42, size);
         testStrlen(STRLEN::STANDARD, size);
 

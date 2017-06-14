@@ -3,6 +3,7 @@ section .text
 global strlen_normal
 global strlen_scas
 global strlen_sse42
+global strlen_sse
 
 ;----------------------------- witchout special instructions
 strlen_normal:
@@ -40,6 +41,47 @@ strlen_scas:
     mov rax, 0x7fffffff
     sub rax, rcx
     dec rax
+
+    pop rbp
+    ret
+
+;---------------------------- witch sse
+strlen_sse:
+    push rbp
+    mov rbp,rsp
+
+    %idefine argx [rdi]
+
+    mov rax, rdi
+    sub rax, 16
+    pxor   xmm1,xmm1
+SSE_LOOP:
+    add rax, 16
+
+    movdqa xmm0,[rax]
+    ; TODO: use pminub
+    ; pminub xmm0,[rax+0x10]
+    ; pminub xmm0,[rax+0x20]
+    ; pminub xmm0,[rax+0x30]
+    pcmpeqb xmm0,xmm1
+    pmovmskb edx,xmm0
+    test edx, edx
+    je SSE_LOOP
+
+
+    ; process rest 0-15 bytes
+    mov rsi, rax
+SSE_LOOP_REST:
+    mov al, [rsi]
+    cmp al, 0
+    je SSE_LOOP_REST_END
+    inc rsi
+    jmp SSE_LOOP_REST
+SSE_LOOP_REST_END:
+
+    ; return length, not pointer
+    mov rax, rsi
+    sub rax, rdi
 
     pop rbp
     ret
