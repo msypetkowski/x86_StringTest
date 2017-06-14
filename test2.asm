@@ -73,12 +73,10 @@ PCMP_LOOP:
 
     movdqa xmm1,[rsi]
     movdqa xmm2,[rdi]
-    pcmpeqb xmm0,xmm1
     pcmpeqb xmm1,xmm2
-    psubb  xmm1,xmm0
     pmovmskb edx,xmm1
     sub    edx,0xffff
-    je PCMP_LOOP
+    jz PCMP_LOOP
 
     ; compare tailing 0-15 bytes
     mov r9, rax

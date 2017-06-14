@@ -120,17 +120,18 @@ STRCMP
 __________|__________|__________|__________|__________
           |       min|       max|       med|rel. stddev
 ----------|----------|----------|----------|----------
-    NORMAL|     12630|     46203|   13152.6|    24.343
+    NORMAL|     14721|     89987|   15435.6|   31.3166
 ----------|----------|----------|----------|----------
-      CMPS|      4233|     21667|    4414.5|   44.5999
+      CMPS|      4232|     22488|    4402.3|   37.6476
 ----------|----------|----------|----------|----------
-     SSE42|       423|     15343|     445.9|  118.0751
+     SSE42|       423|     11733|     450.5|  103.8172
 ----------|----------|----------|----------|----------
-   PCMPEQB|       387|     12064|     416.4|  143.2525
+   PCMPEQB|       301|     11894|     362.1|  147.4617
 ----------|----------|----------|----------|----------
-  STANDARD|       341|     15808|     365.4|  139.8601
+  STANDARD|       341|     11321|     368.8|  127.2847
 \end{lstlisting}
-$STANDARD$ implementation uses $PCMEQB$, but it is for some reason slightly faster than my implementation.
+$STANDARD$ implementation uses $PCMEQB$.
+MY $PCMPEQB$ gives slightly better results, maybe binaries linked from standard C library are compiled for other processor model (with different cache, etc.).
 
 
 
